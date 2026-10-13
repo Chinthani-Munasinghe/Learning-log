@@ -14,9 +14,9 @@ date = datetime.date.today().isoformat()
 
 try:
     req = urllib.request.Request(
-        "https://models.github.ai/inference/chat/completions",
+        "https://models.inference.ai.azure.com/chat/completions",
         data=json.dumps({
-            "model": "openai/gpt-4o-mini",
+            "model": "gpt-4o-mini",
             "messages": [{
                 "role": "user",
                 "content": f"Write a short original study note (150 words) on: {topic}. Markdown, with one example.",
@@ -24,8 +24,6 @@ try:
         }).encode(),
         headers={
             "Content-Type": "application/json",
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
             "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
         },
     )
