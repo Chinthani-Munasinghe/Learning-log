@@ -16,7 +16,7 @@ try:
     req = urllib.request.Request(
         "https://models.github.ai/inference/chat/completions",
         data=json.dumps({
-            "model": "openai/gpt-4.1-mini",
+            "model": "openai/gpt-4o-mini",
             "messages": [{
                 "role": "user",
                 "content": f"Write a short original study note (150 words) on: {topic}. Markdown, with one example.",
@@ -24,10 +24,19 @@ try:
         }).encode(),
         headers={
             "Content-Type": "application/json",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
             "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
         },
     )
-    text = json.load(urllib.request.urlopen(req, timeout=60))["choices"][0]["message"]["content"]
+    with urllib.request.urlopen(req, timeout=60) as r:
+        body = r.read().decode()
+    print("RESPONSE:", body[:500])
+    text = json.loads(body)["choices"][0]["message"]["content"]
+except urllib.error.HTTPError as e:
+    detail = e.read().decode()[:300]
+    print("HTTP ERROR:", e.code, detail)
+    text = f"Study topic for today: {topic}.\n\n(AI generation skipped: HTTP {e.code})"
 except Exception as e:
     text = f"Study topic for today: {topic}.\n\n(AI generation skipped: {e})"
 
